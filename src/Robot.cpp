@@ -15,14 +15,10 @@ private:
 	static const int HEAD_MOTOR_PWM = 7;
 	static const int WING_FLAP_PWM = 8;
 	static const int WING_FOLD_PWM = 9;
-//	static const int SOUND_1 = 8;
-//	static const int SOUND_2 = 2;
 
 	RobotDrive *drive;
 	GamepadF310 *pilot;
 	GamepadF310 *copilot;
-//	DigitalOutput *sound1;
-//	DigitalOutput *sound2;
 	DigitalOutput *sounds[10];
 	void RobotInit()
 	{
@@ -41,10 +37,6 @@ private:
 		drive->SetInvertedMotor(RobotDrive::kRearRightMotor, true);
 		for (int i = 0; i < 10; i++)
 			sounds[i]= new DigitalOutput(i);
-//		sound1 = new DigitalOutput(SOUND_1);
-//		sound2 = new DigitalOutput(SOUND_2);
-//		sound1->Set(1);
-//		sound2->Set(1);
 	}
 
 
