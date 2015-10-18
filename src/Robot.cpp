@@ -19,6 +19,8 @@ private:
 	RobotDrive *drive;
 	GamepadF310 *pilot;
 	GamepadF310 *copilot;
+	Victor *jaw;
+	Victor *head;
 	DigitalOutput *sounds[10];
 	void RobotInit()
 	{
@@ -26,6 +28,9 @@ private:
 		pilot = new GamepadF310(0);
 
 		copilot = new GamepadF310(1);
+
+		head = new Victor (HEAD_MOTOR_PWM);
+		jaw = new Victor (JAW_MOTOR_PWM);
 
 		drive = new RobotDrive(
 			new Victor(FRONT_LEFT_PWM),
@@ -37,6 +42,8 @@ private:
 		drive->SetInvertedMotor(RobotDrive::kRearRightMotor, true);
 		for (int i = 0; i < 10; i++)
 			sounds[i]= new DigitalOutput(i);
+
+		jaw->Set(0.0);
 	}
 
 
@@ -73,20 +80,46 @@ private:
 	{
 		PlaySound(1);
 		if(pilot ->DPadX()==1){
-			PlaySound(8);
+			PlaySound(4);
+		}
+		else if(pilot ->DPadX()==-1){
+			PlaySound(1);
+		}
+		else if(pilot ->DPadY()==1){
+			PlaySound(2);
+		}
+		else if(pilot ->DPadY()==-1){
+					PlaySound(3);
 		}
 		else {
 			StopSound();
 		}
+		//Quentin is actually Voldemort
+		/*Hi
+		 *
+		 */
+		if (copilot->LeftY() == -1.0){
+			jaw->Set(0.2);
+		} else if (copilot -> LeftY() == 1.0){
+			jaw->Set(-0.4);
+		} else {
+			jaw->Set(0.0);
+		}
+		if (copilot->RightY() == 1.0){
+					head->Set(0.4);
+				} else if (copilot -> RightY() == -1.0){
+					head->Set(-0.2);
+				} else {
+					head->Set(0.0);
+				}
+		SmartDashboard::PutNumber("LeftY", copilot->LeftY());
 		float speed=3;
 		if(pilot->ButtonState(F310Buttons::LeftStick))
 			speed=1.25;
 		drive->MecanumDrive_Cartesian(
 				pilot->LeftX()/speed,
 				-pilot->LeftY()/speed,
-				pilot->RightX()/speed
-
-		);
+				pilot->RightX()/speed	);
 	}
 
 };
