@@ -1,6 +1,7 @@
 #include "WPILib.h"
 
 #include "../utils/830utilities.h"
+#include "Wing.h"
 
 class Robot: public IterativeRobot
 {
@@ -21,6 +22,7 @@ private:
 	GamepadF310 *copilot;
 	Victor *jaw;
 	Victor *head;
+	Wing * wing;
 	DigitalOutput *sounds[10];
 	void RobotInit()
 	{
@@ -31,6 +33,11 @@ private:
 
 		head = new Victor (HEAD_MOTOR_PWM);
 		jaw = new Victor (JAW_MOTOR_PWM);
+
+		wing = new Wing(
+			new Victor(WING_FLAP_PWM),
+			new Victor(WING_FOLD_PWM)
+		);
 
 		drive = new RobotDrive(
 			new Victor(FRONT_LEFT_PWM),
@@ -78,6 +85,14 @@ private:
 
 	void TeleopPeriodic()
 	{
+		wing -> update();
+		if(copilot->ButtonState(F310Buttons::Start)){
+			wing->extend();
+		}
+		else if(copilot->ButtonState(F310Buttons::Back)){
+			wing->retract();
+		}
+		wing->flap(copilot->RightTrigger() / 2.0);
 		PlaySound(1);
 		if(pilot ->DPadX()==1){
 			PlaySound(4);
@@ -89,12 +104,12 @@ private:
 			PlaySound(2);
 		}
 		else if(pilot ->DPadY()==-1){
-					PlaySound(3);
+			PlaySound(3);
 		}
 		else {
 			StopSound();
 		}
-		//Quentin is actually Voldemort
+		//Quentin is ACTUALLY Voldemort
 		/*Hi
 		 *
 		 */
