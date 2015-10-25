@@ -109,10 +109,7 @@ private:
 		else {
 			StopSound();
 		}
-		//Quentin is ACTUALLY Voldemort
-		/*Hi
-		 *
-		 */
+
 		if (copilot->LeftY() == -1.0){
 			jaw->Set(0.2);
 		} else if (copilot -> LeftY() == 1.0){
