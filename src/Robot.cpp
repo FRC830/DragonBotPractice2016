@@ -2,6 +2,7 @@
 
 #include "../utils/830utilities.h"
 #include "Wing.h"
+#include "Head.h"
 
 class Robot: public IterativeRobot
 {
@@ -15,15 +16,18 @@ private:
 	static const int JAW_MOTOR_PWM = 6;
 	static const int HEAD_MOTOR_PWM = 7;
 	static const int WING_FLAP_PWM = 8;
+	static const int NUM_SOUNDS = 8;
+
 	static const int WING_FOLD_PWM = 9;
 
+	static const int EYE_LIGHT_DIO = 8;
 	RobotDrive *drive;
 	GamepadF310 *pilot;
 	GamepadF310 *copilot;
-	Victor *jaw;
-	Victor *head;
+	Head *head;
 	Wing * wing;
-	DigitalOutput *sounds[10];
+
+	DigitalOutput *sounds[NUM_SOUNDS];
 	void RobotInit()
 	{
 
@@ -31,8 +35,11 @@ private:
 
 		copilot = new GamepadF310(1);
 
-		head = new Victor (HEAD_MOTOR_PWM);
-		jaw = new Victor (JAW_MOTOR_PWM);
+		head = new Head(
+			new Victor (JAW_MOTOR_PWM),
+			new Victor (HEAD_MOTOR_PWM),
+			new DigitalOutput (EYE_LIGHT_DIO)
+		);
 
 		wing = new Wing(
 			new Victor(WING_FLAP_PWM),
@@ -50,16 +57,16 @@ private:
 		for (int i = 0; i < 10; i++)
 			sounds[i]= new DigitalOutput(i);
 
-		jaw->Set(0.0);
+		head->reset();
 	}
 
 
 	void PlaySound (int id) {
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < NUM_SOUNDS; i++)
 			sounds[i]->Set(i != id);
 	}
 	void StopSound () {
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < NUM_SOUNDS; i++)
 			sounds[i]->Set(1);
 	}
 
@@ -110,20 +117,32 @@ private:
 			StopSound();
 		}
 
+		head->reset();
 		if (copilot->LeftY() == -1.0){
-			jaw->Set(0.2);
+			head->Jaw_down();
 		} else if (copilot -> LeftY() == 1.0){
-			jaw->Set(-0.4);
-		} else {
-			jaw->Set(0.0);
+			head->Jaw_up();
 		}
 		if (copilot->RightY() == 1.0){
-					head->Set(0.4);
-				} else if (copilot -> RightY() == -1.0){
-					head->Set(-0.2);
-				} else {
-					head->Set(0.0);
-				}
+			head->Head_up();
+		} else if (copilot -> RightY() == -1.0){
+			head->Head_down();
+		}
+
+		GamepadF310::ButtonEvent e;
+		while (copilot->GetButtonEvent(&e)) {
+			if (e.button == F310Buttons::B && e.pressed) {
+				head->toggle_eyes();
+			}
+		}
+
+		static int flickerStage = 0;
+		flickerStage++;
+		if(flickerStage >= 5 && copilot->ButtonState(F310Buttons::A)){
+			head->toggle_eyes();
+			flickerStage = 0;
+		}
+
 		SmartDashboard::PutNumber("LeftY", copilot->LeftY());
 		float speed=3;
 		if(pilot->ButtonState(F310Buttons::LeftStick))
