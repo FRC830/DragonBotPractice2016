@@ -11,7 +11,7 @@
 
 class Head {
 public:
-	Head(Victor * jaw, Victor * head, DigitalOutput * eyes);
+	Head(Victor * jaw, Victor * head, DigitalOutput * eyeLight, Servo * eyeServo);
 	virtual ~Head();
 	void Head_up();
 	void Head_down();
@@ -19,10 +19,12 @@ public:
 	void Jaw_down();
 	void reset();
 	void toggle_eyes();
+	void setEyesPosition(float position);
 private:
 	Victor * jaw;
 	Victor * head;
-	DigitalOutput * eyes;
+	Servo * eyeServo;
+	DigitalOutput * eyeLight;
 	bool eyes_on;
 };
 

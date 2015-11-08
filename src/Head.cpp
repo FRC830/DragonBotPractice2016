@@ -7,8 +7,8 @@
 
 #include <Head.h>
 
-Head::Head(Victor * jaw, Victor * head, DigitalOutput * eyes)
-	:jaw(jaw), head(head), eyes(eyes), eyes_on(false)
+Head::Head(Victor * jaw, Victor * head, DigitalOutput * eyes, Servo * eyeMove)
+	:jaw(jaw), head(head), eyeLight(eyes), eyeServo(eyeMove), eyes_on(false)
 {
 	eyes->Set(0);
 }
@@ -41,5 +41,9 @@ void Head::reset() {
 
 void Head::toggle_eyes() {
 	eyes_on = !eyes_on;
-	eyes->Set(eyes_on);
+	eyeLight->Set(eyes_on);
+}
+
+void Head::setEyesPosition(float position){
+	eyeServo->Set(position);
 }

@@ -1,11 +1,11 @@
 #include "WPILib.h"
+#include "stdlib.h"
 
 #include "../utils/830utilities.h"
 #include "Wing.h"
 #include "Head.h"
 
-class Robot: public IterativeRobot
-{
+class Robot: public IterativeRobot {
 private:
 	static const int EYE_PWM = 0;
 	static const int FRONT_LEFT_PWM = 1;
@@ -38,7 +38,8 @@ private:
 		head = new Head(
 			new Victor (JAW_MOTOR_PWM),
 			new Victor (HEAD_MOTOR_PWM),
-			new DigitalOutput (EYE_LIGHT_DIO)
+			new DigitalOutput (EYE_LIGHT_DIO),
+			new Servo(EYE_PWM)
 		);
 
 		wing = new Wing(
@@ -137,10 +138,20 @@ private:
 		}
 
 		static int flickerStage = 0;
+		static int finalStage = 0;
 		flickerStage++;
-		if(flickerStage >= 5 && copilot->ButtonState(F310Buttons::A)){
+		if(flickerStage >= finalStage && copilot->ButtonState(F310Buttons::A)){
 			head->toggle_eyes();
 			flickerStage = 0;
+			finalStage = rand() % 10 + 1;
+		}
+
+		if(copilot->ButtonState(5)){//left bumper
+			head->setEyesPosition(0);
+		} else if(copilot->ButtonState(6)){//right bumper
+			head->setEyesPosition(1);
+		} else{
+			head->setEyesPosition(0.5);
 		}
 
 		SmartDashboard::PutNumber("LeftY", copilot->LeftY());
