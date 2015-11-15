@@ -146,9 +146,9 @@ private:
 			finalStage = rand() % 10 + 1;
 		}
 
-		if(copilot->ButtonState(5)){//left bumper
+		if(copilot->ButtonState(F310Buttons::LeftBumper)){//left bumper
 			head->setEyesPosition(0);
-		} else if(copilot->ButtonState(6)){//right bumper
+		} else if(copilot->ButtonState(F310Buttons::RightBumper)){//right bumper
 			head->setEyesPosition(1);
 		} else{
 			head->setEyesPosition(0.5);
